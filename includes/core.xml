@@ -1,0 +1,898 @@
+<Ui xmlns="http://www.runewaker.com/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.runewaker.com/UI.xsd">
+	<Frame name="adBuffBarLoad" parent="UIParent">
+		<Scripts>
+			<OnLoad>
+				this:RegisterEvent("VARIABLES_LOADED")
+			</OnLoad>
+			<OnEvent>
+				adBuffBar.GUI_Event(event)
+			</OnEvent>
+		</Scripts>
+	</Frame>
+	<Frame name="adBuffBarGUICheckTemp" virtual="true">
+		<Size>
+			<AbsDimension x="86" y="24"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentName" inherits="GameFontNormal" justifyH="RIGHT">
+					<Anchors>
+						<Anchor point="RIGHT">
+							<Offset>
+								<AbsDimension x="28" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<CheckButton name="$parentCheck" inherits="UIPanelCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="185" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+		</Frames>
+	</Frame>
+	<Frame name="adBuffBarGUISliderTemp" virtual="true">
+		<Size>
+			<AbsDimension x="86" y="24"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentName" inherits="GameFontNormal" justifyH="RIGHT">
+					<Anchors>
+						<Anchor point="RIGHT">
+							<Offset>
+								<AbsDimension x="28" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Slider name="$parentSlider" orientation="HORIZONTAL">
+				<Size>
+					<AbsDimension x="150" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="126" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture file="Interface\BagFrame\BagFrame-Slider-Border"/>
+						<FontString name="$parentMin" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT"/>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentNow" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="TOP" relativePoint="BOTTOM"/>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentMax" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<ThumbTexture file="Interface\BagFrame\BagFrame-Slider-Knob">
+					<Size>
+						<AbsDimension x="16" y="16"/>
+					</Size>
+				</ThumbTexture>
+				<Scripts>
+					<OnValueChanged>
+						local value = this:GetValue()
+						if this:GetValueStepMode()=="FLOAT" then
+							value = string.format("%.0f", value*100)
+						end
+						_G[this:GetName().."Now"]:SetText(value)
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+		</Frames>
+	</Frame>
+	<Frame name="adBuffBarGUIColorsTemp" virtual="true">
+		<Size>
+			<AbsDimension x="86" y="24"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentName" inherits="GameFontNormal" justifyH="RIGHT">
+					<Anchors>
+						<Anchor point="RIGHT">
+							<Offset>
+								<AbsDimension x="28" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentBuffs" inherits="ColorPickerMenuTemp">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="160" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						adBuffBar.GUI_ColorsClick(this)
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentDebuffs" inherits="ColorPickerMenuTemp">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="220" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						adBuffBar.GUI_ColorsClick(this)
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+	<Frame name="adBuffBarGUI" inherits="UICommonFrameTemplate" parent="UIParent" hidden="true" frameLevel="1">
+		<Size>
+			<AbsDimension x="350" y="460"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentVersion" inherits="GameFontGray">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-20" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<ScrollFrame name="adBuffBarScrollFrame" inherits="UIPanelScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="322" y="336"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<ScrollChild>
+					<Frame>
+						<Frames>
+							<Frame name="adBuffBarGUIBarWidth" inherits="adBuffBarGUISliderTemp">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="45" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										local slider = _G[this:GetName().."Slider"]
+										slider:SetValueStepMode("INT") slider:SetMinMaxValues(120, 240)
+										_G[this:GetName().."SliderMin"]:SetText("120") _G[this:GetName().."SliderMax"]:SetText("240")
+									</OnLoad>
+								</Scripts>
+							</Frame>
+							<Frame name="adBuffBarGUIBarScale" inherits="adBuffBarGUISliderTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUIBarWidth"/>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										local slider = _G[this:GetName().."Slider"]
+										slider:SetValueStepMode("FLOAT") slider:SetMinMaxValues(0.5, 2)
+										_G[this:GetName().."SliderMin"]:SetText("50%") _G[this:GetName().."SliderMax"]:SetText("200%")
+									</OnLoad>
+								</Scripts>
+							</Frame>
+							<Frame name="adBuffBarGUIFlashTime" inherits="adBuffBarGUISliderTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUIBarScale"/>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										local slider = _G[this:GetName().."Slider"]
+										slider:SetValueStepMode("INT") slider:SetMinMaxValues(1, 60)
+										_G[this:GetName().."SliderMin"]:SetText("1s") _G[this:GetName().."SliderMax"]:SetText("60s")
+									</OnLoad>
+								</Scripts>
+							</Frame>
+							<Frame name="adBuffBarGUIFlash" inherits="adBuffBarGUICheckTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUIFlashTime"/>
+								</Anchors>
+							</Frame>
+							<Frame name="adBuffBarGUIFlashToRed" inherits="adBuffBarGUICheckTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUIFlash"/>
+								</Anchors>
+							</Frame>
+							<Frame name="adBuffBarGUIFills" inherits="adBuffBarGUICheckTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUIFlashToRed"/>
+								</Anchors>
+							</Frame>
+							<Frame name="adBuffBarGUIInvertFilling" inherits="adBuffBarGUICheckTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUIFills"/>
+								</Anchors>
+							</Frame>
+							<Frame name="adBuffBarGUIBuffsAmount" inherits="adBuffBarGUISliderTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUIInvertFilling"/>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										local slider = _G[this:GetName().."Slider"]
+										slider:SetValueStepMode("INT") slider:SetMinMaxValues(5, 40)
+										_G[this:GetName().."SliderMin"]:SetText("5") _G[this:GetName().."SliderMax"]:SetText("40")
+									</OnLoad>
+								</Scripts>
+							</Frame>
+							<Frame name="adBuffBarGUIDebuffsAmount" inherits="adBuffBarGUISliderTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUIBuffsAmount"/>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										local slider = _G[this:GetName().."Slider"]
+										slider:SetValueStepMode("INT") slider:SetMinMaxValues(5, 40)
+										_G[this:GetName().."SliderMin"]:SetText("5") _G[this:GetName().."SliderMax"]:SetText("40")
+									</OnLoad>
+								</Scripts>
+							</Frame>
+							<Frame name="adBuffBarGUIIcons" inherits="adBuffBarGUICheckTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUIDebuffsAmount"/>
+								</Anchors>
+							</Frame>
+							<Frame name="adBuffBarGUIShrink" inherits="adBuffBarGUICheckTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUIIcons"/>
+								</Anchors>
+							</Frame>
+							<Frame name="adBuffBarGUILocked" inherits="adBuffBarGUICheckTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUIShrink"/>
+								</Anchors>
+							</Frame>
+							<Frame name="adBuffBarGUIMirror" inherits="adBuffBarGUICheckTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUILocked"/>
+								</Anchors>
+							</Frame>
+							<Frame name="adBuffBarGUISnap">
+								<Size>
+									<AbsDimension x="86" y="24"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUIMirror"/>
+								</Anchors>
+								<Layers>
+									<Layer level="ARTWORK">
+										<FontString name="$parentName" inherits="GameFontNormal" justifyH="RIGHT">
+											<Anchors>
+												<Anchor point="RIGHT">
+													<Offset>
+														<AbsDimension x="28" y="-2"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Frames>
+									<Button inherits="UIPanelButtonTemplate" text="L">
+										<Size>
+											<AbsDimension x="20" y="20"/>
+										</Size>
+										<Anchors>
+											<Anchor point="TOPLEFT">
+												<Offset>
+													<AbsDimension x="153" y="2"/>
+												</Offset>
+											</Anchor>
+										</Anchors>
+										<Scripts>
+											<OnClick>
+												adBBSet["PlayerDebuff_X"] = -18
+												adBBSet["PlayerDebuff_Y"] = 0
+												adBBSet["TargetDebuff_X"] = -18
+												adBBSet["TargetDebuff_Y"] = 0
+												adBuffBar.GUI_SnapLR("LEFT")
+											</OnClick>
+										</Scripts>
+									</Button>
+									<Button inherits="UIPanelButtonTemplate" text="U">
+										<Size>
+											<AbsDimension x="20" y="20"/>
+										</Size>
+										<Anchors>
+											<Anchor point="TOPLEFT">
+												<Offset>
+													<AbsDimension x="178" y="2"/>
+												</Offset>
+											</Anchor>
+										</Anchors>
+										<Scripts>
+											<OnClick>
+												adBuffBar.GUI_Snap("TOP")
+											</OnClick>
+										</Scripts>
+									</Button>
+									<Button inherits="UIPanelButtonTemplate" text="R">
+										<Size>
+											<AbsDimension x="20" y="20"/>
+										</Size>
+										<Anchors>
+											<Anchor point="TOPLEFT">
+												<Offset>
+													<AbsDimension x="203" y="2"/>
+												</Offset>
+											</Anchor>
+										</Anchors>
+										<Scripts>
+											<OnClick>
+												adBBSet["PlayerDebuff_X"] = 18
+												adBBSet["PlayerDebuff_Y"] = 0
+												adBBSet["TargetDebuff_X"] = 18
+												adBBSet["TargetDebuff_Y"] = 0
+												adBuffBar.GUI_SnapLR("RIGHT")
+											</OnClick>
+										</Scripts>
+									</Button>
+									<Button inherits="UIPanelButtonTemplate" text="D">
+										<Size>
+											<AbsDimension x="20" y="20"/>
+										</Size>
+										<Anchors>
+											<Anchor point="TOPLEFT">
+												<Offset>
+													<AbsDimension x="228" y="2"/>
+												</Offset>
+											</Anchor>
+										</Anchors>
+										<Scripts>
+											<OnClick>
+												adBuffBar.GUI_Snap("BOTTOM")
+											</OnClick>
+										</Scripts>
+									</Button>
+								</Frames>
+							</Frame>
+							<Frame name="adBuffBarGUIShortTime" inherits="adBuffBarGUICheckTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUISnap"/>
+								</Anchors>
+							</Frame>
+							<Frame name="adBuffBarGUIColorsPlayer" inherits="adBuffBarGUIColorsTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUIShortTime"/>
+								</Anchors>
+							</Frame>
+							<Frame name="adBuffBarGUIColorsTarget" inherits="adBuffBarGUIColorsTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUIColorsPlayer"/>
+								</Anchors>
+							</Frame>
+							<Frame name="adBuffBarGUIPlayerBuffs" inherits="adBuffBarGUICheckTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUIColorsTarget"/>
+								</Anchors>
+							</Frame>
+							<Frame name="adBuffBarGUIPlayerDebuffs" inherits="adBuffBarGUICheckTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUIPlayerBuffs"/>
+								</Anchors>
+							</Frame>
+							<Frame name="adBuffBarGUITargetBuffs" inherits="adBuffBarGUICheckTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUIPlayerDebuffs"/>
+								</Anchors>
+							</Frame>
+							<Frame name="adBuffBarGUITargetDebuffs" inherits="adBuffBarGUICheckTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUITargetBuffs"/>
+								</Anchors>
+							</Frame>
+							<Frame name="adBuffBarGUIOrigPlayer" inherits="adBuffBarGUICheckTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUITargetDebuffs"/>
+								</Anchors>
+							</Frame>
+							<Frame name="adBuffBarGUIOrigTarget" inherits="adBuffBarGUICheckTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUIOrigPlayer"/>
+								</Anchors>
+							</Frame>
+							<Frame name="adBuffBarGUIDebuffBorder" inherits="adBuffBarGUICheckTemp">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="adBuffBarGUIOrigTarget"/>
+								</Anchors>
+							</Frame>
+						</Frames>
+					</Frame>
+				</ScrollChild>
+			</ScrollFrame>
+			<Frame name="$parentSkinMenu" inherits="UIDropDownMenuTemplate">
+				<Size>
+					<AbsDimension x="100" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="84" y="-57"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentName" inherits="GameFontNormal" justifyH="RIGHT">
+							<Anchors>
+								<Anchor point="RIGHT" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="-50" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnShow>
+						UIDropDownMenu_Initialize(this, adBuffBar.GUI_SkinMenuShow)
+						UIDropDownMenu_SetSelectedID(adBuffBarGUISkinMenu, adBBSet["value"])
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Button name="$parentSwitch">
+				<NormalTexture file="interface\CharacterFrame\EquipSwapButton-Normal"/>
+				<PushedTexture file="interface\CharacterFrame\EquipSwapButton-Depress"/>
+				<HighlightTexture file="interface\CharacterFrame\EquipSwapButton-Normal" alphaMode="ADD"/>
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentSkinMenu">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						adBuffBar.GUI_SwitchSkin()
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_BOTTOM", 0, 0)
+						GameTooltip:SetText(adBuffBar.Lang["Skin"])
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button inherits="UIPanelButtonTemplate" text="DEFAULT">
+				<Size>
+					<AbsDimension x="86" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="-110" y="-24"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						adBuffBar.GUI_Reset()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button inherits="UIPanelButtonTemplate" text="OBJ_MOVE">
+				<Size>
+					<AbsDimension x="86" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-24"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						adBuffBarPlayerBuff1:Show()
+						adBuffBarPlayerDebuff1:Show()
+						adBuffBarTargetBuff1:Show()
+						adBuffBarTargetDebuff1:Show()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button inherits="UIPanelButtonTemplate" text="OBJ_APPLY">
+				<Size>
+					<AbsDimension x="86" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="110" y="-24"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						adBuffBar.GUI_Save()
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				adBuffBar.GUI_Show()
+				if XBARVERSION and XBARVERSION>=1.51 then
+					XAddon_Page(this)
+					XAddon_HideBack1(this)
+					adBuffBarGUITitle:SetText("")
+					adBuffBarGUIVersion:SetText("")
+				end
+			</OnShow>
+		</Scripts>
+	</Frame>
+	<StatusBar name="adBuffBarTemp" virtual="true" minValue="0" maxValue="100" hidden="true" enableMouse="true">
+		<Size>
+			<AbsDimension x="180" y="18"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\Common\Block-Fill">
+					<Color b="0" g="0" r="0" a="0.2"/>
+				</Texture>
+				<Texture name="$parentIcon" file="Interface\Icons\christmas_14.dds">
+					<Size>
+						<AbsDimension x="18" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="-18" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<FontString name="$parentCount" inherits="NumberFontNormalYellow" text="10">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" relativeTo="$parentIcon">
+							<Offset>
+								<AbsDimension x="-2" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentName" inherits="CharStatusValueNumberFont" text="This is the buff name" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="120" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="4" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentDuration" inherits="CharStatusValueNumberFont" text="12:12" justifyH="RIGHT">
+					<Size>
+						<AbsDimension x="50" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-4" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture name="$parentSpark" file="Interface\Addons\adBuffBar\textures\spark" alphaMode="ADD" hidden="true">
+					<Size>
+						<AbsDimension x="32" y="42"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentBorder" file="Interface\Buttons\Debuff_Border" alphaMode="ADD" hidden="true">
+					<Size>
+						<AbsDimension x="22" y="22"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentIcon"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				adBuffBar.Load(this)
+			</OnLoad>
+			<OnEvent>
+				adBuffBar.OnBarEvent(this)
+			</OnEvent>
+			<OnUpdate>
+				adBuffBar.OnBarUpdate(this)
+			</OnUpdate>
+			<OnClick>
+				adBuffBar.Click(this)
+			</OnClick>
+			<OnEnter>
+				adBuffBar.Enter(this)
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+		<BarTexture name="$parentBarTexture" file="Interface\Common\BarFill"/>
+	</StatusBar>
+	<Frame name="adBuffBarListTemp" frameStrata="LOW" virtual="true">
+		<Frames>
+			<StatusBar name="$parent1" inherits="adBuffBarTemp" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+			</StatusBar>
+			<Button name="$parentAnchor">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent1">
+						<Offset>
+							<AbsDimension x="-26" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnMouseDown>
+						adBuffBar.Down(this, key)
+					</OnMouseDown>
+					<OnMouseUp>
+						adBuffBar.Up(this)
+					</OnMouseUp>
+				</Scripts>
+				<NormalTexture file="Interface\WorldMap\WorldMap-TitlebarSwitch-Normal"/>
+				<PushedTexture file="Interface\WorldMap\WorldMap-TitlebarSwitch-Depress"/>
+			</Button>
+			<StatusBar name="$parent2" inherits="adBuffBarTemp" id="2">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent1" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent3" inherits="adBuffBarTemp" id="3">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent2" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent4" inherits="adBuffBarTemp" id="4">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent3" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent5" inherits="adBuffBarTemp" id="5">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent4" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent6" inherits="adBuffBarTemp" id="6">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent5" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent7" inherits="adBuffBarTemp" id="7">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent6" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent8" inherits="adBuffBarTemp" id="8">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent7" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent9" inherits="adBuffBarTemp" id="9">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent8" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent10" inherits="adBuffBarTemp" id="10">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent9" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent11" inherits="adBuffBarTemp" id="11">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent10" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent12" inherits="adBuffBarTemp" id="12">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent11" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent13" inherits="adBuffBarTemp" id="13">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent12" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent14" inherits="adBuffBarTemp" id="14">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent13" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent15" inherits="adBuffBarTemp" id="15">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent14" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent16" inherits="adBuffBarTemp" id="16">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent15" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent17" inherits="adBuffBarTemp" id="17">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent16" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent18" inherits="adBuffBarTemp" id="18">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent17" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent19" inherits="adBuffBarTemp" id="19">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent18" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent20" inherits="adBuffBarTemp" id="20">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent19" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent21" inherits="adBuffBarTemp" id="21">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent20" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent22" inherits="adBuffBarTemp" id="22">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent21" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent23" inherits="adBuffBarTemp" id="23">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent22" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent24" inherits="adBuffBarTemp" id="24">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent23" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent25" inherits="adBuffBarTemp" id="25">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent24" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent26" inherits="adBuffBarTemp" id="26">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent25" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent27" inherits="adBuffBarTemp" id="27">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent26" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent28" inherits="adBuffBarTemp" id="28">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent27" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent29" inherits="adBuffBarTemp" id="29">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent28" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent30" inherits="adBuffBarTemp" id="30">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent29" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent31" inherits="adBuffBarTemp" id="31">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent30" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent32" inherits="adBuffBarTemp" id="32">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent31" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent33" inherits="adBuffBarTemp" id="33">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent32" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent34" inherits="adBuffBarTemp" id="34">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent33" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent35" inherits="adBuffBarTemp" id="35">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent34" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent36" inherits="adBuffBarTemp" id="36">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent35" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent37" inherits="adBuffBarTemp" id="37">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent36" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent38" inherits="adBuffBarTemp" id="38">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent37" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent39" inherits="adBuffBarTemp" id="39">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent38" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent40" inherits="adBuffBarTemp" id="40">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent39" relativePoint="BOTTOM"/>
+				</Anchors>
+			</StatusBar>
+		</Frames>
+	</Frame>
+	<Frame name="adBuffBarPlayerBuff" inherits="adBuffBarListTemp" parent="UIParent"/>
+	<Frame name="adBuffBarTargetBuff" inherits="adBuffBarListTemp" parent="UIParent"/>
+	<Frame name="adBuffBarPlayerDebuff" inherits="adBuffBarListTemp" parent="UIParent"/>
+	<Frame name="adBuffBarTargetDebuff" inherits="adBuffBarListTemp" parent="UIParent"/>
+</Ui>

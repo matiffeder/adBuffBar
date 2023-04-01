@@ -1,0 +1,21 @@
+## Title: adBuffBar
+## Version: 1.0
+## Notes: Displays player's buffs and debuffs as customizable bars freely displayable on the screen.
+## Author: KranKhaft
+
+## .____             _____   
+## |    |    __ __  /  _  \  
+## |    |   |  |  \/  /_\  \ 
+## |    |___|  |  /    |    \
+## |_______ \____/\____|__  /
+##         \/             \/ 
+includes/core.lua
+
+## ____  ___       .____     
+## \   \/  / _____ |    |    
+##  \     / /     \|    |    
+##  /     \|  Y Y  \    |___ 
+## /___/\  \__|_|  /_______ \
+##       \_/     \/        \/
+includes/core.xml
+
